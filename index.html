@@ -49,7 +49,8 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
 
 .dashboard-strip { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 14px; margin-bottom: 2px; -webkit-overflow-scrolling: touch; }
 .dashboard-strip:empty { display: none; }
-.dash-tile { flex: 0 0 auto; min-width: 76px; border: none; border-radius: 10px; padding: 8px 10px; color: #fff; cursor: pointer; text-align: center; font-family: inherit; }
+.dash-tile { position: relative; flex: 0 0 auto; min-width: 76px; border: none; border-radius: 10px; padding: 8px 10px; color: #fff; cursor: pointer; text-align: center; font-family: inherit; }
+.dash-new-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: #fff; font-size: 0.62em; font-weight: 800; min-width: 17px; height: 17px; border-radius: 999px; display: flex; align-items: center; justify-content: center; padding: 0 3px; box-shadow: 0 0 0 2px var(--bg); }
 .dash-tile:active { opacity: 0.8; }
 .dash-tile .dash-icon { font-size: 1.2em; display: block; }
 .dash-tile .dash-count { font-size: 1.15em; font-weight: 800; line-height: 1.3; }
@@ -83,6 +84,7 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
 .news-title { font-size: 0.92em; line-height: 1.4; }
 .news-meta { font-size: 0.72em; color: var(--sub); margin-top: 5px; display: flex; align-items: center; gap: 6px; }
 .news-meta .source-chip { background: var(--border); color: var(--text); padding: 1px 8px; border-radius: 20px; font-weight: 600; }
+.news-meta .new-chip { background: #ef4444; color: #fff; padding: 1px 7px; border-radius: 20px; font-weight: 800; font-size: 0.92em; }
 
 .section[data-key="entertainment"] .news-list li { border-left-color: #ec4899; }
 .section[data-key="economy"] .news-list li { border-left-color: #0891b2; }
@@ -227,7 +229,15 @@ const SECTIONS = [
 ];
 const CACHE_KEY = 'newsCache_v1';
 const GAS_URL_KEY = 'newsGasUrl';
+const LAST_VISIT_KEY = 'newsLastVisitAt';
 let mainContentHtml = null;
+let compareTime = null;
+
+function isNewItem(item) {
+  if (!compareTime || !item || !item.pubDate) return false;
+  const d = new Date(item.pubDate);
+  return !isNaN(d.getTime()) && d > compareTime;
+}
 
 const DASH_META = [
   { key: 'entertainment', icon: '🎭', label: '芸能', cls: 'dash-ent' },
@@ -329,7 +339,9 @@ function renderNewsList(key, items) {
   list.innerHTML = items.map(item => (
     '<li><a href="' + escapeHtml(item.link) + '" target="_blank" rel="noopener">' +
     '<div class="news-title">' + escapeHtml(item.title) + '</div>' +
-    '<div class="news-meta"><span class="source-chip">' + escapeHtml(item.source || '不明') + '</span><span>' + escapeHtml(relativeTime(item.pubDate)) + '</span></div>' +
+    '<div class="news-meta">' +
+    (isNewItem(item) ? '<span class="new-chip">NEW</span>' : '') +
+    '<span class="source-chip">' + escapeHtml(item.source || '不明') + '</span><span>' + escapeHtml(relativeTime(item.pubDate)) + '</span></div>' +
     '</a></li>'
   )).join('');
 }
@@ -339,11 +351,15 @@ function renderDashboard(data) {
   if (!strip) return;
   if (!data) { strip.innerHTML = ''; return; }
   strip.innerHTML = DASH_META.map(m => {
-    const count = m.key === 'funds'
-      ? ((data.funds && data.funds.relatedNews) ? data.funds.relatedNews.length : 0)
-      : ((data[m.key] || []).length);
+    const items = m.key === 'funds'
+      ? ((data.funds && data.funds.relatedNews) ? data.funds.relatedNews : [])
+      : (data[m.key] || []);
+    const count = items.length;
+    const newCount = items.filter(isNewItem).length;
+    const newBadge = newCount > 0 ? '<span class="dash-new-badge">' + newCount + '</span>' : '';
     return (
       '<button class="dash-tile ' + m.cls + '" onclick="scrollToSection(\'' + m.key + '\')">' +
+      newBadge +
       '<span class="dash-icon">' + m.icon + '</span>' +
       '<span class="dash-count">' + count + '</span>' +
       '<span class="dash-label">' + m.label + '</span>' +
@@ -462,6 +478,10 @@ function init() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
+
+  const lastVisitRaw = localStorage.getItem(LAST_VISIT_KEY);
+  compareTime = lastVisitRaw ? new Date(lastVisitRaw) : null;
+  localStorage.setItem(LAST_VISIT_KEY, new Date().toISOString());
 
   const gasUrl = localStorage.getItem(GAS_URL_KEY) || '';
   document.getElementById('gasUrlInput').value = gasUrl;
