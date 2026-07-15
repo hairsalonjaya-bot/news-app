@@ -153,7 +153,7 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
     <section class="section" data-key="breaking">
       <div class="section-hero hero-brk">
         <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="55,4 24,46 46,46 40,76 78,34 54,34" fill="#fff"/></svg>
-        <h2>⚡ 速報</h2>
+        <h2>⚡ 速報 TOP5</h2>
       </div>
       <ul class="news-list" id="list-breaking"></ul>
       <div class="section-status" id="status-breaking"></div>
@@ -162,7 +162,7 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
     <section class="section" data-key="entertainment">
       <div class="section-hero hero-ent">
         <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="44" y="6" width="20" height="34" rx="10" fill="#fff"/><path d="M30 32 a24 24 0 0 0 48 0" stroke="#fff" stroke-width="4" fill="none"/><line x1="54" y1="56" x2="54" y2="70" stroke="#fff" stroke-width="4"/><line x1="40" y1="70" x2="68" y2="70" stroke="#fff" stroke-width="4"/></svg>
-        <h2>🎭 エンタメニュース TOP10</h2>
+        <h2>🎭 エンタメニュース TOP5</h2>
       </div>
       <ul class="news-list" id="list-entertainment"></ul>
       <div class="section-status" id="status-entertainment"></div>
@@ -180,7 +180,7 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
     <section class="section" data-key="economy">
       <div class="section-hero hero-eco">
         <svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="42" width="14" height="24" fill="#fff"/><rect x="30" y="28" width="14" height="38" fill="#fff"/><rect x="52" y="14" width="14" height="52" fill="#fff"/><polyline points="8,34 30,20 52,8 74,2" fill="none" stroke="#fff" stroke-width="3"/></svg>
-        <h2>💹 経済ニュース TOP10</h2>
+        <h2>💹 経済ニュース TOP5</h2>
       </div>
       <ul class="news-list" id="list-economy"></ul>
       <div class="section-status" id="status-economy"></div>
@@ -189,7 +189,7 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
     <section class="section" data-key="sports">
       <div class="section-hero hero-spo">
         <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="55" cy="38" r="30" fill="none" stroke="#fff" stroke-width="4"/><polygon points="55,20 66,29 62,42 48,42 44,29" fill="#fff"/><line x1="55" y1="8" x2="55" y2="20" stroke="#fff" stroke-width="4"/><line x1="25" y1="38" x2="37" y2="38" stroke="#fff" stroke-width="4"/></svg>
-        <h2>⚽ スポーツニュース TOP10</h2>
+        <h2>⚽ スポーツニュース TOP5</h2>
       </div>
       <ul class="news-list" id="list-sports"></ul>
       <div class="section-status" id="status-sports"></div>
@@ -198,7 +198,7 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
     <section class="section" data-key="rizin">
       <div class="section-hero hero-riz">
         <svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><polygon points="35,6 65,6 87,28 87,42 65,64 35,64 13,42 13,28" fill="none" stroke="#fff" stroke-width="4"/></svg>
-        <h2>🥊 RIZIN格闘技情報</h2>
+        <h2>🥊 RIZIN格闘技情報 TOP5</h2>
       </div>
       <ul class="news-list" id="list-rizin"></ul>
       <div class="section-status" id="status-rizin"></div>
@@ -207,7 +207,7 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
     <section class="section" data-key="tesla">
       <div class="section-hero hero-tsl">
         <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg"><path d="M8 42 L18 20 Q24 12 34 12 L64 12 Q74 12 80 20 L90 42 Z" fill="#fff"/><circle cx="28" cy="46" r="9" fill="none" stroke="#fff" stroke-width="4"/><circle cx="70" cy="46" r="9" fill="none" stroke="#fff" stroke-width="4"/></svg>
-        <h2>🚗 テスラ情報</h2>
+        <h2>🚗 テスラ情報 TOP5</h2>
       </div>
       <ul class="news-list" id="list-tesla"></ul>
       <div class="section-status" id="status-tesla"></div>
@@ -245,13 +245,13 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
 
 <script>
 const SECTIONS = [
-  { key: 'breaking', limit: 10 },
-  { key: 'entertainment', limit: 10 },
+  { key: 'breaking', limit: 5 },
+  { key: 'entertainment', limit: 5 },
   { key: 'tottori', limit: 5 },
-  { key: 'economy', limit: 10 },
-  { key: 'sports', limit: 10 },
-  { key: 'rizin', limit: 10 },
-  { key: 'tesla', limit: 10 }
+  { key: 'economy', limit: 5 },
+  { key: 'sports', limit: 5 },
+  { key: 'rizin', limit: 5 },
+  { key: 'tesla', limit: 5 }
 ];
 const CACHE_KEY = 'newsCache_v1';
 const GAS_URL_KEY = 'newsGasUrl';
