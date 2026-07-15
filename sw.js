@@ -1,4 +1,4 @@
-const CACHE_NAME = 'news-app-v1';
+const CACHE_NAME = 'news-app-v2';
 const ASSETS = [
   './',
   './index.html',
@@ -17,8 +17,18 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
+// ニュースアプリは更新頻度が高いため、まずネットワークから最新を取得し、
+// オフライン時のみキャッシュにフォールバックする(ネットワーク優先)。
+// キャッシュ優先だと、GASからの記事データは毎回最新でもアプリ本体(index.html等)の
+// 見た目の修正が反映されなくなるため。
 self.addEventListener('fetch', e => {
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    fetch(e.request)
+      .then(res => {
+        const resClone = res.clone();
+        caches.open(CACHE_NAME).then(c => c.put(e.request, resClone));
+        return res;
+      })
+      .catch(() => caches.match(e.request))
   );
 });

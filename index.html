@@ -47,7 +47,21 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 #lastUpdated { font-size: 0.75em; color: var(--sub); }
 
-.section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 14px 10px; margin-bottom: 12px; overflow: hidden; }
+.dashboard-strip { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 14px; margin-bottom: 2px; -webkit-overflow-scrolling: touch; }
+.dashboard-strip:empty { display: none; }
+.dash-tile { flex: 0 0 auto; min-width: 76px; border: none; border-radius: 10px; padding: 8px 10px; color: #fff; cursor: pointer; text-align: center; font-family: inherit; }
+.dash-tile:active { opacity: 0.8; }
+.dash-tile .dash-icon { font-size: 1.2em; display: block; }
+.dash-tile .dash-count { font-size: 1.15em; font-weight: 800; line-height: 1.3; }
+.dash-tile .dash-label { font-size: 0.62em; opacity: 0.92; white-space: nowrap; }
+.dash-tile.dash-ent { background: linear-gradient(135deg, #ec4899, #7c3aed); }
+.dash-tile.dash-eco { background: linear-gradient(135deg, #0891b2, #1d4ed8); }
+.dash-tile.dash-tot { background: linear-gradient(135deg, #16a34a, #ca8a04); }
+.dash-tile.dash-riz { background: linear-gradient(135deg, #1f2937, #dc2626); }
+.dash-tile.dash-tsl { background: linear-gradient(135deg, #111827, #374151); }
+.dash-tile.dash-fund { background: linear-gradient(135deg, #059669, #0d9488); }
+
+.section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 14px 10px; margin-bottom: 12px; overflow: hidden; scroll-margin-top: 84px; }
 .section h2 { font-size: 0.98em; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 .section h2 .count { font-size: 0.75em; color: var(--sub); font-weight: 500; margin-left: auto; }
 
@@ -62,12 +76,20 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
 .hero-fund { background: linear-gradient(135deg, #059669, #0d9488); }
 
 .news-list { list-style: none; }
-.news-list li { border-bottom: 1px solid var(--border); }
-.news-list li:last-child { border-bottom: none; }
-.news-list a { display: block; padding: 9px 2px; text-decoration: none; color: var(--text); }
+.news-list li { background: var(--bg); border-left: 3px solid var(--border); border-radius: 6px; margin-bottom: 6px; }
+.news-list li:last-child { margin-bottom: 0; }
+.news-list a { display: block; padding: 9px 10px; text-decoration: none; color: var(--text); }
 .news-list a:active { opacity: 0.7; }
 .news-title { font-size: 0.92em; line-height: 1.4; }
-.news-meta { font-size: 0.74em; color: var(--sub); margin-top: 3px; display: flex; gap: 6px; }
+.news-meta { font-size: 0.72em; color: var(--sub); margin-top: 5px; display: flex; align-items: center; gap: 6px; }
+.news-meta .source-chip { background: var(--border); color: var(--text); padding: 1px 8px; border-radius: 20px; font-weight: 600; }
+
+.section[data-key="entertainment"] .news-list li { border-left-color: #ec4899; }
+.section[data-key="economy"] .news-list li { border-left-color: #0891b2; }
+.section[data-key="tottori"] .news-list li { border-left-color: #16a34a; }
+.section[data-key="rizin"] .news-list li { border-left-color: #dc2626; }
+.section[data-key="tesla"] .news-list li { border-left-color: #6b7280; }
+.section[data-key="funds"] .news-list li { border-left-color: #059669; }
 
 .section-status { padding: 14px 2px; font-size: 0.85em; color: var(--sub); text-align: center; }
 .section-status .retry-btn { display: inline-block; margin-top: 8px; padding: 5px 14px; border: 1px solid var(--border); border-radius: 6px; background: none; color: var(--blue); font-size: 0.9em; cursor: pointer; }
@@ -116,6 +138,8 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
     </div>
     <div id="lastUpdated"></div>
   </header>
+
+  <div class="dashboard-strip" id="dashboardStrip"></div>
 
   <main id="mainContent">
     <section class="section" data-key="entertainment">
@@ -205,6 +229,15 @@ const CACHE_KEY = 'newsCache_v1';
 const GAS_URL_KEY = 'newsGasUrl';
 let mainContentHtml = null;
 
+const DASH_META = [
+  { key: 'entertainment', icon: '🎭', label: '芸能', cls: 'dash-ent' },
+  { key: 'economy', icon: '💹', label: '経済', cls: 'dash-eco' },
+  { key: 'tottori', icon: '🏞️', label: '鳥取', cls: 'dash-tot' },
+  { key: 'rizin', icon: '🥊', label: 'RIZIN', cls: 'dash-riz' },
+  { key: 'tesla', icon: '🚗', label: 'テスラ', cls: 'dash-tsl' },
+  { key: 'funds', icon: '📈', label: '投信', cls: 'dash-fund' }
+];
+
 function escapeHtml(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -252,6 +285,7 @@ function saveSettings() {
 function showSetupPrompt() {
   const main = document.getElementById('mainContent');
   if (mainContentHtml === null) mainContentHtml = main.innerHTML;
+  renderDashboard(null);
   main.innerHTML =
     '<div class="setup-prompt">' +
     '<div style="font-size:2.4em">📰</div>' +
@@ -295,9 +329,32 @@ function renderNewsList(key, items) {
   list.innerHTML = items.map(item => (
     '<li><a href="' + escapeHtml(item.link) + '" target="_blank" rel="noopener">' +
     '<div class="news-title">' + escapeHtml(item.title) + '</div>' +
-    '<div class="news-meta"><span>' + escapeHtml(item.source || '') + '</span><span>' + escapeHtml(relativeTime(item.pubDate)) + '</span></div>' +
+    '<div class="news-meta"><span class="source-chip">' + escapeHtml(item.source || '不明') + '</span><span>' + escapeHtml(relativeTime(item.pubDate)) + '</span></div>' +
     '</a></li>'
   )).join('');
+}
+
+function renderDashboard(data) {
+  const strip = document.getElementById('dashboardStrip');
+  if (!strip) return;
+  if (!data) { strip.innerHTML = ''; return; }
+  strip.innerHTML = DASH_META.map(m => {
+    const count = m.key === 'funds'
+      ? ((data.funds && data.funds.relatedNews) ? data.funds.relatedNews.length : 0)
+      : ((data[m.key] || []).length);
+    return (
+      '<button class="dash-tile ' + m.cls + '" onclick="scrollToSection(\'' + m.key + '\')">' +
+      '<span class="dash-icon">' + m.icon + '</span>' +
+      '<span class="dash-count">' + count + '</span>' +
+      '<span class="dash-label">' + m.label + '</span>' +
+      '</button>'
+    );
+  }).join('');
+}
+
+function scrollToSection(key) {
+  const el = document.querySelector('.section[data-key="' + key + '"]');
+  if (el) el.scrollIntoView({ behavior: 'auto', block: 'start' });
 }
 
 function renderSectionError(key) {
@@ -345,6 +402,7 @@ function renderAll(data) {
   restoreMainContent();
   SECTIONS.forEach(s => renderNewsList(s.key, data[s.key]));
   renderFunds(data.funds);
+  renderDashboard(data);
 }
 
 function setAllError() {
@@ -353,6 +411,7 @@ function setAllError() {
   const cardsEl = document.getElementById('fundCards');
   if (cardsEl) cardsEl.innerHTML = '';
   renderSectionError('funds');
+  renderDashboard(null);
 }
 
 function setLastUpdated(isoStr, fromCache) {
