@@ -47,9 +47,19 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
 @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 #lastUpdated { font-size: 0.75em; color: var(--sub); }
 
-.section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 14px 10px; margin-bottom: 12px; }
+.section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 14px 10px; margin-bottom: 12px; overflow: hidden; }
 .section h2 { font-size: 0.98em; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 .section h2 .count { font-size: 0.75em; color: var(--sub); font-weight: 500; margin-left: auto; }
+
+.section-hero { position: relative; height: 60px; border-radius: 8px; margin: -14px -14px 12px; display: flex; align-items: center; padding: 0 14px; overflow: hidden; }
+.section-hero h2 { color: #fff; margin: 0; text-shadow: 0 1px 3px rgba(0,0,0,.3); position: relative; z-index: 2; }
+.section-hero svg { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); height: 84px; width: 110px; opacity: 0.4; z-index: 1; }
+.hero-ent { background: linear-gradient(135deg, #ec4899, #7c3aed); }
+.hero-eco { background: linear-gradient(135deg, #0891b2, #1d4ed8); }
+.hero-tot { background: linear-gradient(135deg, #16a34a, #ca8a04); }
+.hero-riz { background: linear-gradient(135deg, #1f2937, #dc2626); }
+.hero-tsl { background: linear-gradient(135deg, #111827, #374151); }
+.hero-fund { background: linear-gradient(135deg, #059669, #0d9488); }
 
 .news-list { list-style: none; }
 .news-list li { border-bottom: 1px solid var(--border); }
@@ -109,37 +119,55 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
 
   <main id="mainContent">
     <section class="section" data-key="entertainment">
-      <h2>🎭 芸能ニュース TOP10</h2>
+      <div class="section-hero hero-ent">
+        <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="44" y="6" width="20" height="34" rx="10" fill="#fff"/><path d="M30 32 a24 24 0 0 0 48 0" stroke="#fff" stroke-width="4" fill="none"/><line x1="54" y1="56" x2="54" y2="70" stroke="#fff" stroke-width="4"/><line x1="40" y1="70" x2="68" y2="70" stroke="#fff" stroke-width="4"/></svg>
+        <h2>🎭 芸能ニュース TOP10</h2>
+      </div>
       <ul class="news-list" id="list-entertainment"></ul>
       <div class="section-status" id="status-entertainment"></div>
     </section>
 
     <section class="section" data-key="economy">
-      <h2>💹 経済ニュース TOP10</h2>
+      <div class="section-hero hero-eco">
+        <svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="42" width="14" height="24" fill="#fff"/><rect x="30" y="28" width="14" height="38" fill="#fff"/><rect x="52" y="14" width="14" height="52" fill="#fff"/><polyline points="8,34 30,20 52,8 74,2" fill="none" stroke="#fff" stroke-width="3"/></svg>
+        <h2>💹 経済ニュース TOP10</h2>
+      </div>
       <ul class="news-list" id="list-economy"></ul>
       <div class="section-status" id="status-economy"></div>
     </section>
 
     <section class="section" data-key="tottori">
-      <h2>🏞️ 鳥取県・鳥取市のニュース TOP5</h2>
+      <div class="section-hero hero-tot">
+        <svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><circle cx="78" cy="16" r="9" fill="#fff"/><path d="M-5 55 Q15 35 35 55 T75 55 T115 55 V75 H-5 Z" fill="#fff"/></svg>
+        <h2>🏞️ 鳥取県・鳥取市のニュース TOP5</h2>
+      </div>
       <ul class="news-list" id="list-tottori"></ul>
       <div class="section-status" id="status-tottori"></div>
     </section>
 
     <section class="section" data-key="rizin">
-      <h2>🥊 RIZIN格闘技情報</h2>
+      <div class="section-hero hero-riz">
+        <svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><polygon points="35,6 65,6 87,28 87,42 65,64 35,64 13,42 13,28" fill="none" stroke="#fff" stroke-width="4"/></svg>
+        <h2>🥊 RIZIN格闘技情報</h2>
+      </div>
       <ul class="news-list" id="list-rizin"></ul>
       <div class="section-status" id="status-rizin"></div>
     </section>
 
     <section class="section" data-key="tesla">
-      <h2>🚗 テスラ情報</h2>
+      <div class="section-hero hero-tsl">
+        <svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg"><path d="M8 42 L18 20 Q24 12 34 12 L64 12 Q74 12 80 20 L90 42 Z" fill="#fff"/><circle cx="28" cy="46" r="9" fill="none" stroke="#fff" stroke-width="4"/><circle cx="70" cy="46" r="9" fill="none" stroke="#fff" stroke-width="4"/></svg>
+        <h2>🚗 テスラ情報</h2>
+      </div>
       <ul class="news-list" id="list-tesla"></ul>
       <div class="section-status" id="status-tesla"></div>
     </section>
 
     <section class="section" data-key="funds">
-      <h2>📈 投資信託情報（SP500・オルカン）</h2>
+      <div class="section-hero hero-fund">
+        <svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg"><polyline points="8,55 28,40 46,48 66,20 90,8" fill="none" stroke="#fff" stroke-width="4"/><circle cx="90" cy="8" r="5" fill="#fff"/></svg>
+        <h2>📈 投資信託情報（SP500・オルカン）</h2>
+      </div>
       <div class="fund-cards" id="fundCards"></div>
       <div class="fund-subtitle">関連ニュース</div>
       <ul class="news-list" id="list-funds"></ul>
