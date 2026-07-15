@@ -55,9 +55,11 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
 .dash-tile .dash-icon { font-size: 1.2em; display: block; }
 .dash-tile .dash-count { font-size: 1.15em; font-weight: 800; line-height: 1.3; }
 .dash-tile .dash-label { font-size: 0.62em; opacity: 0.92; white-space: nowrap; }
+.dash-tile.dash-brk { background: linear-gradient(135deg, #f97316, #dc2626); }
 .dash-tile.dash-ent { background: linear-gradient(135deg, #ec4899, #7c3aed); }
 .dash-tile.dash-eco { background: linear-gradient(135deg, #0891b2, #1d4ed8); }
 .dash-tile.dash-tot { background: linear-gradient(135deg, #16a34a, #ca8a04); }
+.dash-tile.dash-spo { background: linear-gradient(135deg, #22c55e, #0d9488); }
 .dash-tile.dash-riz { background: linear-gradient(135deg, #1f2937, #dc2626); }
 .dash-tile.dash-tsl { background: linear-gradient(135deg, #111827, #374151); }
 .dash-tile.dash-fund { background: linear-gradient(135deg, #059669, #0d9488); }
@@ -69,9 +71,11 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
 .section-hero { position: relative; height: 60px; border-radius: 8px; margin: -14px -14px 12px; display: flex; align-items: center; padding: 0 14px; overflow: hidden; }
 .section-hero h2 { color: #fff; margin: 0; text-shadow: 0 1px 3px rgba(0,0,0,.3); position: relative; z-index: 2; }
 .section-hero svg { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); height: 84px; width: 110px; opacity: 0.4; z-index: 1; }
+.hero-brk { background: linear-gradient(135deg, #f97316, #dc2626); }
 .hero-ent { background: linear-gradient(135deg, #ec4899, #7c3aed); }
 .hero-eco { background: linear-gradient(135deg, #0891b2, #1d4ed8); }
 .hero-tot { background: linear-gradient(135deg, #16a34a, #ca8a04); }
+.hero-spo { background: linear-gradient(135deg, #22c55e, #0d9488); }
 .hero-riz { background: linear-gradient(135deg, #1f2937, #dc2626); }
 .hero-tsl { background: linear-gradient(135deg, #111827, #374151); }
 .hero-fund { background: linear-gradient(135deg, #059669, #0d9488); }
@@ -86,9 +90,11 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
 .news-meta .source-chip { background: var(--border); color: var(--text); padding: 1px 8px; border-radius: 20px; font-weight: 600; }
 .news-meta .new-chip { background: #ef4444; color: #fff; padding: 1px 7px; border-radius: 20px; font-weight: 800; font-size: 0.92em; }
 
+.section[data-key="breaking"] .news-list li { border-left-color: #f97316; }
 .section[data-key="entertainment"] .news-list li { border-left-color: #ec4899; }
 .section[data-key="economy"] .news-list li { border-left-color: #0891b2; }
 .section[data-key="tottori"] .news-list li { border-left-color: #16a34a; }
+.section[data-key="sports"] .news-list li { border-left-color: #22c55e; }
 .section[data-key="rizin"] .news-list li { border-left-color: #dc2626; }
 .section[data-key="tesla"] .news-list li { border-left-color: #6b7280; }
 .section[data-key="funds"] .news-list li { border-left-color: #059669; }
@@ -144,10 +150,19 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
   <div class="dashboard-strip" id="dashboardStrip"></div>
 
   <main id="mainContent">
+    <section class="section" data-key="breaking">
+      <div class="section-hero hero-brk">
+        <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><polygon points="55,4 24,46 46,46 40,76 78,34 54,34" fill="#fff"/></svg>
+        <h2>⚡ 速報</h2>
+      </div>
+      <ul class="news-list" id="list-breaking"></ul>
+      <div class="section-status" id="status-breaking"></div>
+    </section>
+
     <section class="section" data-key="entertainment">
       <div class="section-hero hero-ent">
         <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><rect x="44" y="6" width="20" height="34" rx="10" fill="#fff"/><path d="M30 32 a24 24 0 0 0 48 0" stroke="#fff" stroke-width="4" fill="none"/><line x1="54" y1="56" x2="54" y2="70" stroke="#fff" stroke-width="4"/><line x1="40" y1="70" x2="68" y2="70" stroke="#fff" stroke-width="4"/></svg>
-        <h2>🎭 芸能ニュース TOP10</h2>
+        <h2>🎭 エンタメニュース TOP10</h2>
       </div>
       <ul class="news-list" id="list-entertainment"></ul>
       <div class="section-status" id="status-entertainment"></div>
@@ -169,6 +184,15 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
       </div>
       <ul class="news-list" id="list-economy"></ul>
       <div class="section-status" id="status-economy"></div>
+    </section>
+
+    <section class="section" data-key="sports">
+      <div class="section-hero hero-spo">
+        <svg viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg"><circle cx="55" cy="38" r="30" fill="none" stroke="#fff" stroke-width="4"/><polygon points="55,20 66,29 62,42 48,42 44,29" fill="#fff"/><line x1="55" y1="8" x2="55" y2="20" stroke="#fff" stroke-width="4"/><line x1="25" y1="38" x2="37" y2="38" stroke="#fff" stroke-width="4"/></svg>
+        <h2>⚽ スポーツニュース TOP10</h2>
+      </div>
+      <ul class="news-list" id="list-sports"></ul>
+      <div class="section-status" id="status-sports"></div>
     </section>
 
     <section class="section" data-key="rizin">
@@ -221,9 +245,11 @@ header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 
 
 <script>
 const SECTIONS = [
+  { key: 'breaking', limit: 10 },
   { key: 'entertainment', limit: 10 },
   { key: 'tottori', limit: 5 },
   { key: 'economy', limit: 10 },
+  { key: 'sports', limit: 10 },
   { key: 'rizin', limit: 10 },
   { key: 'tesla', limit: 10 }
 ];
@@ -240,9 +266,11 @@ function isNewItem(item) {
 }
 
 const DASH_META = [
-  { key: 'entertainment', icon: '🎭', label: '芸能', cls: 'dash-ent' },
+  { key: 'breaking', icon: '⚡', label: '速報', cls: 'dash-brk' },
+  { key: 'entertainment', icon: '🎭', label: 'エンタメ', cls: 'dash-ent' },
   { key: 'tottori', icon: '🏞️', label: '鳥取', cls: 'dash-tot' },
   { key: 'economy', icon: '💹', label: '経済', cls: 'dash-eco' },
+  { key: 'sports', icon: '⚽', label: 'スポーツ', cls: 'dash-spo' },
   { key: 'rizin', icon: '🥊', label: 'RIZIN', cls: 'dash-riz' },
   { key: 'tesla', icon: '🚗', label: 'テスラ', cls: 'dash-tsl' },
   { key: 'funds', icon: '📈', label: '投信', cls: 'dash-fund' }
