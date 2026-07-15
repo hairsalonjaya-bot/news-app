@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>ニュース</title>
+<style>
+:root {
+  --bg: #f5f6fa;
+  --card: #ffffff;
+  --border: #e2e6ea;
+  --text: #2d3748;
+  --sub: #718096;
+  --blue: #2563eb;
+  --green: #1D9E75;
+  --red: #e53e3e;
+  --amber: #d97706;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14181f;
+    --card: #1d232d;
+    --border: #2b3341;
+    --text: #e6e9ef;
+    --sub: #9aa4b2;
+    --blue: #5b8def;
+    --green: #34c98f;
+    --red: #f4685c;
+    --amber: #e5a53f;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic', sans-serif; font-size: 14px; }
+.container { max-width: 720px; margin: 0 auto; padding: 12px 14px 40px; }
+
+header { position: sticky; top: 0; z-index: 20; background: var(--bg); padding: 10px 0 8px; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+.header-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.header-row h1 { font-size: 1.25em; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.header-actions { display: flex; gap: 6px; }
+.icon-btn { border: 1px solid var(--border); background: var(--card); border-radius: 8px; width: 36px; height: 36px; font-size: 1.05em; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.icon-btn:active { opacity: 0.7; }
+.icon-btn.spinning { animation: spin 0.9s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+#lastUpdated { font-size: 0.75em; color: var(--sub); }
+
+.section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 14px 10px; margin-bottom: 12px; }
+.section h2 { font-size: 0.98em; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.section h2 .count { font-size: 0.75em; color: var(--sub); font-weight: 500; margin-left: auto; }
+
+.news-list { list-style: none; }
+.news-list li { border-bottom: 1px solid var(--border); }
+.news-list li:last-child { border-bottom: none; }
+.news-list a { display: block; padding: 9px 2px; text-decoration: none; color: var(--text); }
+.news-list a:active { opacity: 0.7; }
+.news-title { font-size: 0.92em; line-height: 1.4; }
+.news-meta { font-size: 0.74em; color: var(--sub); margin-top: 3px; display: flex; gap: 6px; }
+
+.section-status { padding: 14px 2px; font-size: 0.85em; color: var(--sub); text-align: center; }
+.section-status .retry-btn { display: inline-block; margin-top: 8px; padding: 5px 14px; border: 1px solid var(--border); border-radius: 6px; background: none; color: var(--blue); font-size: 0.9em; cursor: pointer; }
+.skeleton-line { height: 14px; border-radius: 4px; background: var(--border); margin: 10px 2px; animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 0%,100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+.fund-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.fund-card { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.fund-card .fname { font-size: 0.74em; color: var(--sub); margin-bottom: 4px; line-height: 1.3; }
+.fund-card .fnav { font-size: 1.25em; font-weight: 700; }
+.fund-card .fchange { font-size: 0.82em; margin-top: 2px; font-weight: 600; }
+.fund-card .fchange.up { color: var(--red); }
+.fund-card .fchange.down { color: var(--green); }
+.fund-card .fchange.flat { color: var(--sub); }
+.fund-card .stale-badge { display: inline-block; margin-top: 6px; font-size: 0.7em; color: var(--amber); }
+.fund-subtitle { font-size: 0.8em; color: var(--sub); margin: 10px 2px 4px; }
+
+.setup-prompt { text-align: center; padding: 40px 16px; }
+.setup-prompt p { color: var(--sub); font-size: 0.9em; margin: 10px 0 18px; line-height: 1.6; }
+.btn { padding: 9px 20px; border: none; border-radius: 8px; font-size: 0.9em; cursor: pointer; font-weight: 600; }
+.btn-primary { background: var(--blue); color: #fff; }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+
+.sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 50; display: none; align-items: flex-end; }
+.sheet-bg.show { display: flex; }
+.sheet { background: var(--card); width: 100%; border-radius: 14px 14px 0 0; padding: 18px 18px 24px; }
+.sheet h3 { font-size: 1.05em; margin-bottom: 14px; }
+.field label { display: block; font-size: 0.78em; color: var(--sub); margin-bottom: 4px; }
+.field input { width: 100%; padding: 9px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.88em; background: var(--bg); color: var(--text); }
+.info { font-size: 0.75em; color: var(--sub); margin-top: 8px; line-height: 1.5; }
+.sheet-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: #2d3748; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 0.85em; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 60; max-width: 90%; text-align: center; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="header-row">
+      <h1>📰 ニュース</h1>
+      <div class="header-actions">
+        <button class="icon-btn" id="refreshBtn" onclick="fetchAll(true)" aria-label="更新">🔄</button>
+        <button class="icon-btn" onclick="openSettings()" aria-label="設定">⚙️</button>
+      </div>
+    </div>
+    <div id="lastUpdated"></div>
+  </header>
+
+  <main id="mainContent">
+    <section class="section" data-key="entertainment">
+      <h2>🎭 芸能ニュース TOP10</h2>
+      <ul class="news-list" id="list-entertainment"></ul>
+      <div class="section-status" id="status-entertainment"></div>
+    </section>
+
+    <section class="section" data-key="economy">
+      <h2>💹 経済ニュース TOP10</h2>
+      <ul class="news-list" id="list-economy"></ul>
+      <div class="section-status" id="status-economy"></div>
+    </section>
+
+    <section class="section" data-key="tottori">
+      <h2>🏞️ 鳥取県・鳥取市のニュース TOP5</h2>
+      <ul class="news-list" id="list-tottori"></ul>
+      <div class="section-status" id="status-tottori"></div>
+    </section>
+
+    <section class="section" data-key="rizin">
+      <h2>🥊 RIZIN格闘技情報</h2>
+      <ul class="news-list" id="list-rizin"></ul>
+      <div class="section-status" id="status-rizin"></div>
+    </section>
+
+    <section class="section" data-key="tesla">
+      <h2>🚗 テスラ情報</h2>
+      <ul class="news-list" id="list-tesla"></ul>
+      <div class="section-status" id="status-tesla"></div>
+    </section>
+
+    <section class="section" data-key="funds">
+      <h2>📈 投資信託情報（SP500・オルカン）</h2>
+      <div class="fund-cards" id="fundCards"></div>
+      <div class="fund-subtitle">関連ニュース</div>
+      <ul class="news-list" id="list-funds"></ul>
+      <div class="section-status" id="status-funds"></div>
+    </section>
+  </main>
+</div>
+
+<div class="sheet-bg" id="settingsSheetBg" onclick="if(event.target===this) closeSettings()">
+  <div class="sheet">
+    <h3>⚙️ 設定</h3>
+    <div class="field">
+      <label>GAS Web App URL</label>
+      <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/xxxx/exec">
+    </div>
+    <p class="info">ニュース・投資信託データの取得に使うGoogle Apps ScriptのWebアプリURLです。setup_guide.txtの手順でデプロイしたURLを貼り付けてください。</p>
+    <div class="sheet-actions">
+      <button class="btn btn-outline" onclick="closeSettings()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveSettings()">保存して再読み込み</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SECTIONS = [
+  { key: 'entertainment', limit: 10 },
+  { key: 'economy', limit: 10 },
+  { key: 'tottori', limit: 5 },
+  { key: 'rizin', limit: 10 },
+  { key: 'tesla', limit: 10 }
+];
+const CACHE_KEY = 'newsCache_v1';
+const GAS_URL_KEY = 'newsGasUrl';
+let mainContentHtml = null;
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function relativeTime(pubDate) {
+  if (!pubDate) return '';
+  const d = new Date(pubDate);
+  if (isNaN(d.getTime())) return '';
+  const diffMs = Date.now() - d.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return 'たった今';
+  if (diffMin < 60) return diffMin + '分前';
+  const diffHour = Math.floor(diffMin / 60);
+  if (diffHour < 24) return diffHour + '時間前';
+  const diffDay = Math.floor(diffHour / 24);
+  if (diffDay < 7) return diffDay + '日前';
+  return d.toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric' });
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+function openSettings() {
+  document.getElementById('gasUrlInput').value = localStorage.getItem(GAS_URL_KEY) || '';
+  document.getElementById('settingsSheetBg').classList.add('show');
+}
+function closeSettings() {
+  document.getElementById('settingsSheetBg').classList.remove('show');
+}
+function saveSettings() {
+  const url = document.getElementById('gasUrlInput').value.trim();
+  if (!url) { toast('GAS Web App URLを入力してください'); return; }
+  localStorage.setItem(GAS_URL_KEY, url);
+  closeSettings();
+  location.reload();
+}
+
+function showSetupPrompt() {
+  const main = document.getElementById('mainContent');
+  if (mainContentHtml === null) mainContentHtml = main.innerHTML;
+  main.innerHTML =
+    '<div class="setup-prompt">' +
+    '<div style="font-size:2.4em">📰</div>' +
+    '<p>まだGAS Web App URLが設定されていません。<br>setup_guide.txtの手順でGASをデプロイし、発行されたURLを設定してください。</p>' +
+    '<button class="btn btn-primary" onclick="openSettings()">設定を開く</button>' +
+    '</div>';
+}
+function restoreMainContent() {
+  if (mainContentHtml !== null) {
+    document.getElementById('mainContent').innerHTML = mainContentHtml;
+  }
+}
+
+function setSectionLoading(key) {
+  const status = document.getElementById('status-' + key);
+  const list = document.getElementById('list-' + key);
+  if (list) list.innerHTML = '';
+  if (status) {
+    status.innerHTML = '<div class="skeleton-line"></div><div class="skeleton-line" style="width:70%"></div>';
+  }
+}
+
+function setAllLoading() {
+  SECTIONS.forEach(s => setSectionLoading(s.key));
+  setSectionLoading('funds');
+  const cards = document.getElementById('fundCards');
+  if (cards) cards.innerHTML = '';
+}
+
+function renderNewsList(key, items) {
+  const list = document.getElementById('list-' + key);
+  const status = document.getElementById('status-' + key);
+  if (!list || !status) return;
+
+  if (!items || items.length === 0) {
+    list.innerHTML = '';
+    status.innerHTML = '現在この分野のニュースが見つかりません';
+    return;
+  }
+  status.innerHTML = '';
+  list.innerHTML = items.map(item => (
+    '<li><a href="' + escapeHtml(item.link) + '" target="_blank" rel="noopener">' +
+    '<div class="news-title">' + escapeHtml(item.title) + '</div>' +
+    '<div class="news-meta"><span>' + escapeHtml(item.source || '') + '</span><span>' + escapeHtml(relativeTime(item.pubDate)) + '</span></div>' +
+    '</a></li>'
+  )).join('');
+}
+
+function renderSectionError(key) {
+  const status = document.getElementById('status-' + key);
+  const list = document.getElementById('list-' + key);
+  if (list) list.innerHTML = '';
+  if (status) {
+    status.innerHTML = '取得できませんでした<br><button class="retry-btn" onclick="fetchAll(true)">再試行</button>';
+  }
+}
+
+function formatFundChange(fund) {
+  if (fund.changeAbs == null) return { cls: 'flat', text: '前日比: -' };
+  const num = parseFloat(String(fund.changeAbs).replace(/,/g, ''));
+  const arrow = num > 0 ? '▲' : (num < 0 ? '▼' : '―');
+  const cls = num > 0 ? 'up' : (num < 0 ? 'down' : 'flat');
+  const pct = fund.changePct != null ? '(' + fund.changePct + '%)' : '';
+  return { cls: cls, text: arrow + ' ' + fund.changeAbs + ' ' + pct };
+}
+
+function renderFunds(fundsData) {
+  const cardsEl = document.getElementById('fundCards');
+  if (cardsEl) {
+    if (!fundsData || !fundsData.funds || fundsData.funds.length === 0) {
+      cardsEl.innerHTML = '<div class="section-status">投資信託データを取得できませんでした</div>';
+    } else {
+      cardsEl.innerHTML = fundsData.funds.map(fund => {
+        const change = formatFundChange(fund);
+        const staleBadge = fund.stale ? '<div class="stale-badge">⚠️ 前回値を表示中（更新できませんでした）</div>' : '';
+        return (
+          '<div class="fund-card">' +
+          '<div class="fname">' + escapeHtml(fund.name) + '</div>' +
+          '<div class="fnav">' + (fund.nav != null ? escapeHtml(fund.nav) + '円' : '-') + '</div>' +
+          '<div class="fchange ' + change.cls + '">' + escapeHtml(change.text) + '</div>' +
+          staleBadge +
+          '</div>'
+        );
+      }).join('');
+    }
+  }
+  renderNewsList('funds', fundsData ? fundsData.relatedNews : []);
+}
+
+function renderAll(data) {
+  restoreMainContent();
+  SECTIONS.forEach(s => renderNewsList(s.key, data[s.key]));
+  renderFunds(data.funds);
+}
+
+function setAllError() {
+  restoreMainContent();
+  SECTIONS.forEach(s => renderSectionError(s.key));
+  const cardsEl = document.getElementById('fundCards');
+  if (cardsEl) cardsEl.innerHTML = '';
+  renderSectionError('funds');
+}
+
+function setLastUpdated(isoStr, fromCache) {
+  const el = document.getElementById('lastUpdated');
+  if (!el) return;
+  if (!isoStr) { el.textContent = ''; return; }
+  const d = new Date(isoStr);
+  const timeStr = isNaN(d.getTime()) ? '' : d.toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  el.textContent = (fromCache ? '最終更新（キャッシュ）: ' : '最終更新: ') + timeStr;
+}
+
+function setRefreshSpinning(on) {
+  const btn = document.getElementById('refreshBtn');
+  if (btn) btn.classList.toggle('spinning', !!on);
+}
+
+async function fetchAll(isManual) {
+  const gasUrl = localStorage.getItem(GAS_URL_KEY) || '';
+  if (!gasUrl) { showSetupPrompt(); return; }
+
+  const hadCacheBefore = !!localStorage.getItem(CACHE_KEY);
+  if (isManual) setRefreshSpinning(true);
+  if (!hadCacheBefore) setAllLoading();
+
+  try {
+    const res = await fetch(gasUrl + (gasUrl.indexOf('?') === -1 ? '?' : '&') + 'category=all');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.error || '取得エラー');
+
+    renderAll(json.data);
+    const savedAt = new Date().toISOString();
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data: json.data, savedAt: savedAt }));
+    setLastUpdated(savedAt, false);
+  } catch (err) {
+    if (hadCacheBefore) {
+      toast('更新できませんでした（前回のデータを表示中）');
+    } else {
+      setAllError();
+      toast('取得に失敗しました');
+    }
+  } finally {
+    if (isManual) setRefreshSpinning(false);
+  }
+}
+
+function init() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+
+  const gasUrl = localStorage.getItem(GAS_URL_KEY) || '';
+  document.getElementById('gasUrlInput').value = gasUrl;
+
+  let hasCache = false;
+  const cacheRaw = localStorage.getItem(CACHE_KEY);
+  if (cacheRaw) {
+    try {
+      const cache = JSON.parse(cacheRaw);
+      renderAll(cache.data);
+      setLastUpdated(cache.savedAt, true);
+      hasCache = true;
+    } catch (e) { /* 破損キャッシュは無視 */ }
+  }
+
+  if (!gasUrl) {
+    if (!hasCache) showSetupPrompt();
+    return;
+  }
+  fetchAll(false);
+}
+
+init();
+</script>
+</body>
+</html>

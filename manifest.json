@@ -1,0 +1,14 @@
+{
+  "name": "ニュース",
+  "short_name": "ニュース",
+  "description": "芸能・経済・鳥取・RIZIN・テスラ・投資信託の最新ニュースをまとめて表示",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f5f6fa",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
